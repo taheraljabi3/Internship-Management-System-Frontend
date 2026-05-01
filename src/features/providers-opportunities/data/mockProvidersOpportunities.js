@@ -1,0 +1,9 @@
+export const mockInternshipProviders = [];
+export const mockOpportunities = [];
+export const mockApplications = [];
+export const mockProviderRequests = [];
+export const mockRequestedProviderDetails = [];
+export const mockOpportunitySources = [];
+export const mockOpportunityCollectorConfigs = [];
+export const mockApplicationStatusHistory = [];
+export const mockCoverLetterAnalysis = [];

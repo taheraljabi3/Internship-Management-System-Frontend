@@ -1,0 +1,9 @@
+export const mockCompanyEvaluationForms = [];
+export const mockCompanyEvaluations = [];
+export const mockStudentEvaluations = [];
+export const mockEvaluationCriteria = [];
+export const mockEvaluationMarks = [];
+export const mockFinalGrades = [];
+export const mockProviderEvaluations = [];
+export const mockFinalEvaluationReports = [];
+export const mockCertificates = [];
