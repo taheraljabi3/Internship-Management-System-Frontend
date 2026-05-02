@@ -16,18 +16,23 @@ function readInitialLanguage() {
 function LanguageProvider({ children }) {
   const [language, setLanguage] = useState(readInitialLanguage);
 
-  useEffect(() => {
-    try {
-      localStorage.setItem(LANGUAGE_STORAGE_KEY, language);
-    } catch (error) {
-      console.error('Failed to store language preference.', error);
-    }
+useEffect(() => {
+  try {
+    localStorage.setItem(LANGUAGE_STORAGE_KEY, language);
+  } catch (error) {
+    console.error('Failed to store language preference.', error);
+  }
 
-    document.documentElement.lang = language;
-    document.documentElement.dir = language === 'ar' ? 'rtl' : 'ltr';
-    document.body.dir = language === 'ar' ? 'rtl' : 'ltr';
-    document.body.classList.toggle('ims-lang-ar', language === 'ar');
-  }, [language]);
+  const isArabic = language === 'ar';
+
+  document.documentElement.lang = language;
+  document.documentElement.dir = isArabic ? 'rtl' : 'ltr';
+
+  document.body.dir = isArabic ? 'rtl' : 'ltr';
+
+  document.body.classList.remove('ims-lang-ar', 'ims-lang-en');
+  document.body.classList.add(isArabic ? 'ims-lang-ar' : 'ims-lang-en');
+}, [language]);
 
   const value = useMemo(
     () => ({

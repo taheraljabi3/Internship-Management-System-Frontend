@@ -834,3 +834,20 @@ export async function deleteAdminArchivedRecordRequest(id) {
     method: 'DELETE',
   });
 }
+
+export async function updateProfileRequest(userId, payload) {
+  return authorizedApiRequest(`/api/users/${userId}`, {
+    method: 'PUT',
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function changePasswordRequest(payload) {
+  return authorizedApiRequest('/api/auth/change-password', {
+    method: 'POST',
+    body: JSON.stringify({
+      currentPassword: payload.currentPassword,
+      newPassword: payload.newPassword,
+    }),
+  });
+}

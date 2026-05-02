@@ -14,23 +14,37 @@ function ProfilePage() {
   const [form, setForm] = useState({ fullName: user?.fullName || '', email: user?.email || '', username: user?.username || user?.email || '', phone: user?.phone || '' });
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
-
+const [saving, setSaving] = useState(false);
   const handleChange = (event) => {
     const { name, value } = event.target;
     setForm((current) => ({ ...current, [name]: value }));
   };
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    setMessage('');
-    setError('');
-    const result = updateProfile({ fullName: form.fullName, email: form.email, username: form.username, phone: form.phone });
+
+  const handleSubmit = async (event) => {
+  event.preventDefault();
+  setMessage('');
+  setError('');
+  setSaving(true);
+
+  try {
+    const result = await updateProfile({
+      fullName: form.fullName,
+      email: form.email,
+      username: form.username,
+      phone: form.phone,
+    });
+
     if (!result?.success) {
       setError(result?.message || 'Failed to update profile.');
       return;
     }
+
     setMessage(result.message || 'Profile updated successfully.');
-  };
+  } finally {
+    setSaving(false);
+  }
+};
 
   return (
     <div className="container-fluid">
@@ -49,7 +63,10 @@ function ProfilePage() {
               <FormField label="Role"><input type="text" className="form-control" value={t(user?.role || '')} disabled /></FormField>
               {error ? <div className="alert alert-danger py-2">{t(error)}</div> : null}
               {message ? <div className="alert alert-success py-2">{t(message)}</div> : null}
-              <FormActions><button type="submit" className="btn btn-primary">{t('Update Profile')}</button></FormActions>
+              <FormActions>
+                <button type="submit" className="btn btn-primary" disabled={saving}>
+                    {saving ? t('Saving...') : t('Update Profile')}
+                </button></FormActions>
             </form>
           </FormCard>
         </div>

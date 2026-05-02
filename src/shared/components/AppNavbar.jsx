@@ -140,6 +140,101 @@ function isUnreadNotification(notification) {
   return !notification.readAt && status !== 'read';
 }
 
+const HEADER_ICONS = {
+  doctor: (
+    <>
+      <path d="M4.5 7.25A2.75 2.75 0 0 1 7.25 4.5h9.5a2.75 2.75 0 0 1 2.75 2.75v9.5a2.75 2.75 0 0 1-2.75 2.75h-9.5a2.75 2.75 0 0 1-2.75-2.75v-9.5Z" />
+      <path d="m6.5 7.5 5.5 4.25 5.5-4.25" />
+      <path d="M12 12v5" />
+      <path d="M9.5 14.5h5" />
+    </>
+  ),
+
+  calculator: (
+    <>
+      <rect x="5" y="3" width="14" height="18" rx="2.5" />
+      <path d="M8 7h8" />
+      <path d="M8 11h.01" />
+      <path d="M12 11h.01" />
+      <path d="M16 11h.01" />
+      <path d="M8 15h.01" />
+      <path d="M12 15h.01" />
+      <path d="M16 15h.01" />
+      <path d="M8 18h4" />
+      <path d="M16 18h.01" />
+    </>
+  ),
+
+  calendar: (
+    <>
+      <rect x="4" y="5" width="16" height="15" rx="2.5" />
+      <path d="M8 3v4" />
+      <path d="M16 3v4" />
+      <path d="M4 10h16" />
+      <path d="M8 14h.01" />
+      <path d="M12 14h.01" />
+      <path d="M16 14h.01" />
+      <path d="M8 17h.01" />
+      <path d="M12 17h.01" />
+    </>
+  ),
+
+  weather: (
+    <>
+      <path d="M16.25 8.75a4.25 4.25 0 0 0-8.05 1.7A3.75 3.75 0 0 0 9 18h7.25a4.63 4.63 0 0 0 0-9.25Z" />
+      <path d="M6 7.5V6" />
+      <path d="M3.8 9.2 2.7 8.1" />
+      <path d="M8.2 9.2 9.3 8.1" />
+      <path d="M3.5 12H2" />
+    </>
+  ),
+
+  clock: (
+    <>
+      <circle cx="12" cy="12" r="8.5" />
+      <path d="M12 7.5V12l3 2" />
+    </>
+  ),
+
+  language: (
+    <>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M3 12h18" />
+      <path d="M12 3c2.2 2.4 3.3 5.4 3.3 9S14.2 18.6 12 21" />
+      <path d="M12 3C9.8 5.4 8.7 8.4 8.7 12S9.8 18.6 12 21" />
+    </>
+  ),
+
+  notifications: (
+    <>
+      <path d="M18 9a6 6 0 0 0-12 0c0 7-2.5 7.5-2.5 7.5h17S18 16 18 9Z" />
+      <path d="M10 20a2.2 2.2 0 0 0 4 0" />
+    </>
+  ),
+
+  chevronDown: <path d="m7 10 5 5 5-5" />,
+};
+
+function HeaderSvgIcon({ name, size = 21 }) {
+  return (
+    <svg
+      className="ims-topbar-svg"
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.9"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      focusable="false"
+    >
+      {HEADER_ICONS[name] || HEADER_ICONS.notifications}
+    </svg>
+  );
+}
+
 function TopIconButton({ icon, label, onClick, badge = null, isActive = false }) {
   return (
     <button
@@ -150,7 +245,7 @@ function TopIconButton({ icon, label, onClick, badge = null, isActive = false })
       aria-label={label}
     >
       <span className="ims-topbar-icon-symbol" aria-hidden="true">
-        {icon}
+        <HeaderSvgIcon name={icon} />
       </span>
       {badge ? <span className="ims-chip-badge">{badge}</span> : null}
     </button>
@@ -407,38 +502,42 @@ function AppNavbar({ title = 'Internship Management System' }) {
 
         <div className="ims-navbar-tools" ref={panelRef}>
           <TopIconButton
-            icon="✉️"
+            icon="doctor"
             label={t('Contact Doctor')}
             onClick={() => setActivePanel((current) => (current === 'doctor' ? null : 'doctor'))}
             isActive={activePanel === 'doctor'}
           />
           <TopIconButton
-            icon="🧮"
+            icon="calculator"
             label={t('Advanced Calculator')}
             onClick={() => setActivePanel((current) => (current === 'calculator' ? null : 'calculator'))}
             isActive={activePanel === 'calculator'}
           />
           <TopIconButton
-            icon="📅"
+            icon="calendar"
             label={t('Calendar')}
             onClick={() => setActivePanel((current) => (current === 'calendar' ? null : 'calendar'))}
             isActive={activePanel === 'calendar'}
           />
           <TopIconButton
-            icon="🌤️"
+            icon="weather"
             label={t('Madinah Weather')}
             onClick={() => setActivePanel((current) => (current === 'weather' ? null : 'weather'))}
             isActive={activePanel === 'weather'}
           />
           <TopIconButton
-            icon="🕒"
+            icon="clock"
             label={t('Current Time')}
             onClick={() => setActivePanel((current) => (current === 'clock' ? null : 'clock'))}
             isActive={activePanel === 'clock'}
           />
-          <TopIconButton icon="🌐" label={isArabic ? 'English' : 'العربية'} onClick={toggleLanguage} />
           <TopIconButton
-            icon="🔔"
+            icon="language"
+            label={isArabic ? 'English' : 'العربية'}
+            onClick={toggleLanguage}
+          />
+          <TopIconButton
+            icon="notifications"
             label={t('Notifications')}
             onClick={() => setActivePanel((current) => (current === 'notifications' ? null : 'notifications'))}
             isActive={activePanel === 'notifications'}
@@ -456,7 +555,9 @@ function AppNavbar({ title = 'Internship Management System' }) {
                 <div className="ims-user-menu-name">{user?.fullName || user?.email || 'Authenticated User'}</div>
                 <div className="ims-user-menu-role">{t(user?.role || 'User')}</div>
               </div>
-              <span className="ims-user-menu-arrow">▾</span>
+              <span className="ims-user-menu-arrow" aria-hidden="true">
+                <HeaderSvgIcon name="chevronDown" size={16} />
+              </span>
             </button>
 
             {activePanel === 'user' ? (
@@ -630,7 +731,9 @@ function AppNavbar({ title = 'Internship Management System' }) {
                   <div className="fw-semibold">{isArabic ? 'المدينة المنورة' : 'Madinah'}</div>
                   <div className="text-muted small">{weather.loading ? t('Loading') : `${weather.temperature}°C`}</div>
                 </div>
-                <div className="display-6 mb-0">🌤️</div>
+                <span className="d-inline-flex align-items-center justify-content-center" aria-hidden="true">
+                  <HeaderSvgIcon name="weather" size={34} />
+                </span>
               </div>
             </div>
           ) : null}

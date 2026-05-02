@@ -10,6 +10,8 @@ import {
   meRequest,
   persistAuthSession,
   refreshRequest,
+  updateProfileRequest,
+  changePasswordRequest,
 } from '../api/client';
 
 export const AuthContext = createContext(null);
@@ -18,11 +20,11 @@ function normalizeBackendUser(user) {
   if (!user) return null;
 
   return {
-    id: user.id,
-    fullName: user.full_name || '',
+    id: user.id ?? user.user_id ?? user.userId,
+    fullName: user.fullName || user.full_name || '',
     email: user.email || '',
-    username: user.username || user.email || '',
-    phone: user.phone || '',
+    username: user.username || user.user_name || user.email || '',
+    phone: user.phone || user.phone_number || '',
     role: user.role || '',
     status: user.status || '',
   };
@@ -149,19 +151,86 @@ function AuthProvider({ children }) {
     }
   };
 
-  const updateProfile = async () => {
+const updateProfile = async (profileData) => {
+  if (!user?.id) {
     return {
       success: false,
-      message: 'Profile update endpoint is not connected yet.',
+      message: 'No authenticated user found.',
     };
-  };
+  }
 
-  const changePassword = async () => {
+  try {
+    const payload = {
+      full_name: String(profileData.fullName || '').trim(),
+      email: String(profileData.email || '').trim().toLowerCase(),
+      username: String(profileData.username || profileData.email || '').trim(),
+      phone: String(profileData.phone || '').trim(),
+      role: user.role,
+      status: user.status,
+    };
+
+    const response = await updateProfileRequest(user.id, payload);
+
+    const updatedUser = {
+      ...user,
+      fullName: response?.full_name || payload.full_name,
+      email: response?.email || payload.email,
+      username: response?.username || payload.username,
+      phone: response?.phone || payload.phone,
+      role: response?.role || user.role,
+      status: response?.status || user.status,
+    };
+
+    persistAuthSession({
+      access_token: getStoredAccessToken(),
+      refresh_token: getStoredRefreshToken(),
+      session_id: getStoredSessionId(),
+      user: updatedUser,
+    });
+
+    setUser(updatedUser);
+
+    return {
+      success: true,
+      message: 'Profile updated successfully.',
+      user: updatedUser,
+    };
+  } catch (error) {
     return {
       success: false,
-      message: 'Change password endpoint is not connected yet.',
+      message: error.message || 'Failed to update profile.',
     };
-  };
+  }
+};
+
+const changePassword = async ({ currentPassword, newPassword }) => {
+  if (!user) {
+    return {
+      success: false,
+      message: 'No authenticated user found.',
+    };
+  }
+
+  try {
+    const response = await changePasswordRequest({
+      currentPassword,
+      newPassword,
+    });
+
+    return {
+      success: true,
+      message:
+        response?.message ||
+        response?.data?.message ||
+        'Password updated successfully.',
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: error.message || 'Failed to update password.',
+    };
+  }
+};
 
   const register = async () => {
     return {
