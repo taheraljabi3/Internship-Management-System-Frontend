@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import ModulePageHeader from '../../../shared/components/ModulePageHeader';
-import ModuleTabs from '../../../shared/components/ModuleTabs';
 import AppModal from '../../../shared/components/AppModal';
 import { useAuth } from '../../../shared/hooks/useAuth';
 import { useLanguage } from '../../../shared/hooks/useLanguage';
@@ -75,6 +75,35 @@ const adminTabs = [
   { key: 'reports', label: 'Auto Weekly Reports' },
   { key: 'evaluation', label: 'Final Evaluation' },
 ];
+
+const onboardingTargetByTabKey = {
+  pendingEligibility: 'eligibility-tab',
+  invitations: 'admin-invitations-tab',
+  providers: 'company-approval-tab',
+  plans: 'training-plan-tab',
+  reports: 'weekly-reports-tab',
+  evaluation: 'send-company-evaluation',
+};
+
+function OnboardingModuleTabs({ tabs, activeKey, onChange }) {
+  return (
+    <div className="ims-onboarding-module-tabs" role="tablist">
+      {tabs.map((tab) => (
+        <button
+          key={tab.key}
+          type="button"
+          role="tab"
+          data-onboarding={onboardingTargetByTabKey[tab.key] || undefined}
+          aria-selected={activeKey === tab.key}
+          className={activeKey === tab.key ? 'active' : ''}
+          onClick={() => onChange(tab.key)}
+        >
+          <span>{tab.label}</span>
+        </button>
+      ))}
+    </div>
+  );
+}
 
 function StatusBadge({ value }) {
   const label = value || '-';
@@ -465,6 +494,7 @@ function normalizeFinalRequest(item) {
 }
 
 function InternshipModulePage() {
+  const location = useLocation();
   const { user, logout } = useAuth();
   const { isArabic } = useLanguage();
 
@@ -565,6 +595,23 @@ function InternshipModulePage() {
     approvalOwnerUserId: '',
     approvalOwnerRole: 'AcademicAdvisor',
   });
+
+  useEffect(() => {
+    const state = location.state || {};
+
+    if (state.activeTab && tabs.some((tab) => tab.key === state.activeTab)) {
+      setActiveTab(state.activeTab);
+    }
+
+    if (state.openInviteModal && canReview) {
+      setActiveTab('invitations');
+      setInviteForm((current) => ({
+        ...current,
+        advisorUserId: isAdvisor ? String(user?.id || '') : current.advisorUserId,
+      }));
+      setIsInviteModalOpen(true);
+    }
+  }, [location.state, tabs, canReview, isAdvisor, user?.id]);
 
   const effectiveInternshipId = isStudent ? autoContext?.internship_id || '' : contextInternshipId;
   const effectiveTrainingPlanId = isStudent ? autoContext?.latest_training_plan_id || '' : taskForm.trainingPlanId;
@@ -1508,6 +1555,43 @@ function InternshipModulePage() {
   return (
     <div className="ims-training-redesign">
       <style>{`
+        .ims-onboarding-module-tabs {
+          display: flex;
+          align-items: center;
+          gap: .65rem;
+          flex-wrap: wrap;
+          margin-top: 1rem;
+        }
+        .ims-onboarding-module-tabs button {
+          min-height: 42px;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          border: 1px solid rgba(15, 23, 42, 0.10);
+          border-radius: 999px;
+          background: #fff;
+          color: #475569;
+          padding: .45rem 1rem;
+          font-size: .88rem;
+          font-weight: 700;
+          box-shadow: 0 8px 22px rgba(15, 23, 42, 0.04);
+        }
+        .ims-onboarding-module-tabs button.active {
+          color: #fff;
+          border-color: transparent;
+          background: linear-gradient(135deg, #0796a6, #14c8c3);
+          box-shadow: 0 12px 26px rgba(7, 150, 166, 0.18);
+        }
+        .ims-onboarding-quick-actions {
+          display: flex;
+          align-items: center;
+          gap: .65rem;
+          flex-wrap: wrap;
+          padding: .8rem;
+          border: 1px solid rgba(15, 23, 42, 0.08);
+          border-radius: 16px;
+          background: linear-gradient(180deg, rgba(248, 250, 252, 0.95), rgba(255, 255, 255, 0.95));
+        }
         .ims-training-redesign .ims-clean-table-card {
           border: 1px solid rgba(15, 23, 42, 0.08);
           border-radius: 18px;
@@ -1595,7 +1679,39 @@ function InternshipModulePage() {
         </div>
       ) : null}
 
-      <ModuleTabs tabs={tabs} activeKey={activeTab} onChange={setActiveTab} />
+      <OnboardingModuleTabs tabs={tabs} activeKey={activeTab} onChange={setActiveTab} />
+
+      {canReview ? (
+        <div className="ims-onboarding-quick-actions mt-3">
+          <button
+            type="button"
+            className="btn btn-primary btn-sm"
+            data-onboarding="admin-create-invitation"
+            onClick={() => {
+              setActiveTab('invitations');
+              setInviteForm((current) => ({
+                ...current,
+                advisorUserId: isAdvisor ? String(user?.id || '') : current.advisorUserId,
+              }));
+              setIsInviteModalOpen(true);
+            }}
+          >
+            {isArabic ? 'إنشاء دعوة جماعية' : 'Create Bulk Invitation'}
+          </button>
+
+          <button
+            type="button"
+            className="btn btn-outline-primary btn-sm"
+            data-onboarding="send-company-evaluation"
+            onClick={() => {
+              setActiveTab('evaluation');
+              setIsEvaluationModalOpen(true);
+            }}
+          >
+            {isArabic ? 'إرسال تقييم الشركة' : 'Request Final Evaluation'}
+          </button>
+        </div>
+      ) : null}
 
       {generatedInviteLink ? (
         <div className="alert alert-info d-flex justify-content-between align-items-center gap-3 mt-3 flex-wrap">

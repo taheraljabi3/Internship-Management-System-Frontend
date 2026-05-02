@@ -16,6 +16,7 @@ import {
   administratorRoutes,
 } from './routeConfig';
 
+import GuidedOnboardingProvider from '../../features/onboarding/GuidedOnboardingProvider';
 import NotFoundPage from '../../features/misc/pages/NotFoundPage';
 
 function renderRouteList(routes) {
@@ -27,32 +28,39 @@ function renderRouteList(routes) {
 export default function AppRouter() {
   return (
     <BrowserRouter>
-      <Routes>
-        <Route element={<PublicLayout />}>
-          {renderRouteList(publicRoutes)}
-          <Route path={ROUTES.PUBLIC.HOME} element={<Navigate to={ROUTES.PUBLIC.ROOT} replace />} />
-        </Route>
-
-        <Route element={<RequireAuth />}>
-          <Route element={<RequireRole allowedRoles={['Student']} />}>
-            <Route element={<StudentLayout />}>{renderRouteList(studentRoutes)}</Route>
+      <GuidedOnboardingProvider>
+        <Routes>
+          <Route element={<PublicLayout />}>
+            {renderRouteList(publicRoutes)}
+            <Route
+              path={ROUTES.PUBLIC.HOME}
+              element={<Navigate to={ROUTES.PUBLIC.ROOT} replace />}
+            />
           </Route>
 
-          <Route element={<RequireRole allowedRoles={['AcademicAdvisor']} />}>
-            <Route element={<AcademicAdvisorLayout />}>
-              {renderRouteList(academicAdvisorRoutes)}
+          <Route element={<RequireAuth />}>
+            <Route element={<RequireRole allowedRoles={['Student']} />}>
+              <Route element={<StudentLayout />}>
+                {renderRouteList(studentRoutes)}
+              </Route>
+            </Route>
+
+            <Route element={<RequireRole allowedRoles={['AcademicAdvisor']} />}>
+              <Route element={<AcademicAdvisorLayout />}>
+                {renderRouteList(academicAdvisorRoutes)}
+              </Route>
+            </Route>
+
+            <Route element={<RequireRole allowedRoles={['Administrator']} />}>
+              <Route element={<AdministratorLayout />}>
+                {renderRouteList(administratorRoutes)}
+              </Route>
             </Route>
           </Route>
 
-          <Route element={<RequireRole allowedRoles={['Administrator']} />}>
-            <Route element={<AdministratorLayout />}>
-              {renderRouteList(administratorRoutes)}
-            </Route>
-          </Route>
-        </Route>
-
-        <Route path="*" element={<NotFoundPage />} />
-      </Routes>
+          <Route path="*" element={<NotFoundPage />} />
+        </Routes>
+      </GuidedOnboardingProvider>
     </BrowserRouter>
   );
 }

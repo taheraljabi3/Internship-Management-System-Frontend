@@ -16,6 +16,7 @@ function PublicLayout() {
       <main className="container py-4 flex-grow-1">
         <Outlet />
       </main>
+
       <AppFooter />
     </div>
   );

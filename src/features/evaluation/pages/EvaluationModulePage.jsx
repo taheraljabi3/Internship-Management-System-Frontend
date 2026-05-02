@@ -2241,7 +2241,12 @@ function EvaluationModulePage() {
           </button>
 
           {canManage && activeTab === 'templates' ? (
-            <button type="button" className="ims-eval-primary-btn" onClick={openAddTemplateModal}>
+            <button
+              type="button"
+              className="ims-eval-primary-btn"
+              data-onboarding="evaluation-template-builder"
+              onClick={openAddTemplateModal}
+            >
               <SvgIcon name="plus" size={18} />
               {isArabic ? 'إضافة قالب تقييم' : 'Add Evaluation Template'}
             </button>
@@ -2264,6 +2269,7 @@ function EvaluationModulePage() {
           <button
             key={tab.key}
             type="button"
+            data-onboarding={tab.key === 'templates' ? 'evaluation-template-builder' : undefined}
             className={activeTab === tab.key ? 'active' : ''}
             onClick={() => setActiveTab(tab.key)}
           >
@@ -2372,7 +2378,7 @@ function EvaluationModulePage() {
           </section>
 
           {activeTab === 'templates' && canManage ? (
-            <section className="ims-eval-panel">
+            <section className="ims-eval-panel" data-onboarding="evaluation-template-builder">
               <div className="ims-eval-section-head">
                 <div>
                   <h2>{isArabic ? 'قوالب تقييم الشركة' : 'Company Evaluation Templates'}</h2>
@@ -2382,7 +2388,12 @@ function EvaluationModulePage() {
                       : 'Create templates and edit criteria through clean overlay modals.'}
                   </p>
                 </div>
-                <button type="button" className="ims-eval-primary-btn" onClick={openAddTemplateModal}>
+                <button
+                  type="button"
+                  className="ims-eval-primary-btn"
+                  data-onboarding="evaluation-template-builder"
+                  onClick={openAddTemplateModal}
+                >
                   <SvgIcon name="plus" size={18} />
                   {isArabic ? 'إضافة قالب' : 'Add Template'}
                 </button>
