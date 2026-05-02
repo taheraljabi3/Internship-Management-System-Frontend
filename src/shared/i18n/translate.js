@@ -3,7 +3,7 @@ export const translations = {
   'Academic Advisor Portal': 'بوابة المشرف الأكاديمي',
   'Student Portal': 'بوابة الطالب',
   'Administrator Portal': 'بوابة الإدارة',
-  Navigation: 'التنقل',
+  Navigation: 'منصة إدارة التدريب',
   'Student Dashboard': 'لوحة الطالب',
   'Academic Advisor Dashboard': 'لوحة المشرف الأكاديمي',
   'Administrator Dashboard': 'لوحة الإدارة',
